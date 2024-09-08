@@ -7,13 +7,11 @@ const app = express();
 
 app.use(express.json());
 
-// Main program configuration
 const targetUrl = "https://www.thevillagepharmacy.ca/";
-
-const numberOfBots = 50;
+const numberOfBots = 10;
 let count = 0;
 
-// Simulate a bot making an HTTP request and parse the HTML response
+// bot making an HTTP request
 const botRequest = async (targetUrl) => {
    try {
       const userAgent = randomUseragent.getRandom();
@@ -37,9 +35,16 @@ const botRequest = async (targetUrl) => {
 
          count++;
 
-         console.log(
-            `Page Title: ${pageTitle}      -----------      count: ${count}`
-         );
+         // // Log rate-limiting details
+         const rateLimit = response?.headers["x-ratelimit-limit"];
+         const rateLimitRemaining = response?.headers["x-ratelimit-remaining"];
+         const rateLimitReset = response?.headers["x-ratelimit-reset"];
+         const retryAfter = response?.headers["retry-after"];
+
+         console.log(`Page Title: ${pageTitle} | Request Count: ${count}`);
+
+         // Log all headers to inspect rate limiting headers
+         console.log("Response Headers:", response.headers);
 
          //  // Example: Extract all hyperlinks
          //  $("a").each((index, element) => {
@@ -59,7 +64,7 @@ const simulateBotnet = (targetUrl, numberOfBots) => {
    for (let i = 0; i < numberOfBots; i++) {
       setInterval(() => {
          botRequest(targetUrl);
-      }, 100);
+      }, 200);
    }
 };
 
