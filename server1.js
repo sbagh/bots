@@ -5,21 +5,30 @@ const app = express();
 
 app.use(express.json());
 
+let count = 0;
+
 app.get("/bot", (req, res) => {
    const headers = req.headers;
    const userAgent = headers["user-agent"];
 
-   console.log("headers:", headers);
-   console.log(`Request from ${userAgent}`);
+   count++;
 
-   // Check if the request is coming from a bot
+   console.log("headers:", headers);
+   console.log(`Request count: ${count}`);
+
+   let responseMessage = `Request count: ${count}`;
+
+   // Append bot check result to the response message
    if (userAgent.includes("bot")) {
-      res.send("You are a bot!");
+      responseMessage += " - You are a bot!";
    } else {
-      res.send("You are not a bot.");
+      responseMessage += " - You are not a bot.";
    }
+
+   // Send the complete response once
+   res.send(responseMessage);
 });
 
 app.listen(4333, () => {
-   console.log("Server running on port 3000");
+   console.log("Server running on port 4333");
 });
