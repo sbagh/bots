@@ -7,8 +7,12 @@ const app = express();
 
 app.use(express.json());
 
-const targetUrl = "https://www.thevillagepharmacy.ca/";
-const numberOfBots = 10;
+const testURL = "https://www.thevillagepharmacy.ca/";
+const wafURL = "http://localhost:3200/";
+
+const targetUrl = wafURL;
+
+const numberOfBots = 5;
 let count = 0;
 
 // bot making an HTTP request
@@ -27,24 +31,20 @@ const botRequest = async (targetUrl) => {
       if (response.status === 200) {
          const html = response.data;
 
-         // Load the HTML into Cheerio
          const $ = cheerio.load(html);
 
-         // Example: Extract the page title
-         const pageTitle = $("title").text();
+         // const pageTitle = $("title").text();
 
          count++;
 
-         // // Log rate-limiting details
+         // rate-limiting details
          const rateLimit = response?.headers["x-ratelimit-limit"];
          const rateLimitRemaining = response?.headers["x-ratelimit-remaining"];
          const rateLimitReset = response?.headers["x-ratelimit-reset"];
          const retryAfter = response?.headers["retry-after"];
 
-         console.log(`Page Title: ${pageTitle} | Request Count: ${count}`);
-
-         // Log all headers to inspect rate limiting headers
-         console.log("Response Headers:", response.headers);
+         console.log(`Page Title:  | Request Count: ${count}`);
+         // console.log("Response Headers:", response.headers);
 
          //  // Example: Extract all hyperlinks
          //  $("a").each((index, element) => {
@@ -64,7 +64,7 @@ const simulateBotnet = (targetUrl, numberOfBots) => {
    for (let i = 0; i < numberOfBots; i++) {
       setInterval(() => {
          botRequest(targetUrl);
-      }, 200);
+      }, 400);
    }
 };
 
