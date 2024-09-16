@@ -29,6 +29,16 @@ app.get("/bot", (req, res) => {
    res.send(responseMessage);
 });
 
+app.get("/ad-click", (req, res) => {
+   count++;
+   const headers = req.headers;
+   const referer = headers["referer"];
+
+   console.log("count:", count);
+
+   res.send("Ad clicked!");
+});
+
 app.listen(4333, () => {
    console.log("Server running on port 4333");
 });
